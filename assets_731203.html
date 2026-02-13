@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name="robots" content="noindex,nofollow,noarchive">
+    <title>Archive</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sawarabi+Mincho&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #1a1a1c;
+            --panel-bg: #252527;
+            --accent: #a08c5b;
+            --text-color: #d1d1d1;
+        }
+
+        body { 
+            background-color: var(--bg-color); 
+            color: var(--text-color); 
+            font-family: "Sawarabi Mincho", serif; 
+            margin: 0; 
+            padding: 40px 20px; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .container { 
+            max-width: 500px; 
+            width: 100%; 
+        }
+
+        h1 { 
+            color: var(--accent); 
+            font-size: 1.4rem; 
+            text-align: center; 
+            letter-spacing: 0.4rem; 
+            margin-bottom: 40px;
+            border-bottom: 1px solid var(--accent);
+            padding-bottom: 10px;
+        }
+
+        /* iPhoneで押しやすいボタン設計 */
+        .nav-link {
+            display: block;
+            background-color: var(--panel-bg);
+            color: var(--text-color);
+            text-decoration: none;
+            text-align: center;
+            padding: 22px 15px; /* 十分な高さを確保 */
+            margin-bottom: 20px;
+            border: 1px solid #444;
+            border-radius: 4px;
+            font-size: 18px; /* 視認性とタップしやすさ */
+            letter-spacing: 0.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            -webkit-tap-highlight-color: rgba(160, 140, 91, 0.2);
+        }
+
+        /* タップ時の視覚効果：アクセントカラーが光る */
+        .nav-link:active {
+            border-color: var(--accent);
+            color: var(--accent);
+            transform: translateY(2px);
+            box-shadow: none;
+        }
+
+        .external-tag {
+            display: block;
+            font-size: 0.7rem;
+            color: var(--accent);
+            margin-top: 4px;
+            letter-spacing: 0.2rem;
+        }
+
+        /* 検索よけの注意書き（自分用） */
+        .footer {
+            margin-top: auto;
+            font-size: 0.7rem;
+            color: #555;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>ARCHIVE</h1>
+        
+        <a href="assets_23136123.html" class="nav-link">
+            空白・文字数チェッカー（23136123）
+        </a>
+
+        <a href="assets_33122513.html" class="nav-link">
+            頻出ワードチェッカー（33122513）
+        </a>
+
+        <a href="https://www.izuna.sylphid.jp/PWA/" class="nav-link" target="_blank" rel="noopener noreferrer nofollow">
+            Izuna Book
+            <span class="external-tag">EXTERNAL LINK</span>
+        </a>
+    </div>
+
+    <div class="footer">
+        INDEXING PROHIBITED
+    </div>
+
+</body>
+</html>

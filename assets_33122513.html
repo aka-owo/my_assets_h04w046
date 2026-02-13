@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="robots" content="noindex,nofollow">
+    <title>小説推敲ツール Pro - Fixed</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sawarabi+Mincho&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #1a1a1c;
+            --panel-bg: #252527;
+            --accent: #a08c5b;
+            --text-color: #d1d1d1;
+            --error: #af4040;
+            --warning: #d99e32;
+        }
+        body { 
+            background-color: var(--bg-color); 
+            color: var(--text-color); 
+            font-family: "Sawarabi Mincho", serif; 
+            margin: 0; padding: 15px; 
+            box-sizing: border-box; 
+            /* iPhoneのズーム対策：フォントサイズを16px以上に */
+            font-size: 16px;
+        }
+        .container { max-width: 900px; margin: 0 auto; width: 100%; }
+        h1 { color: var(--accent); font-size: 1.2rem; text-align: center; letter-spacing: 0.3rem; margin-bottom: 15px; }
+        
+        /* iPhoneのズームを防ぐため、inputとtextareaは16px以上 */
+        textarea { 
+            width: 100%; height: 250px; 
+            background-color: var(--panel-bg); color: #e0e0e0; 
+            border: 1px solid #444; border-radius: 4px; 
+            padding: 12px; font-size: 16px; line-height: 1.7; 
+            box-sizing: border-box; outline: none; font-family: inherit; 
+        }
+        .controls { display: flex; flex-direction: column; gap: 10px; margin: 15px 0; }
+        .label { font-size: 0.75rem; color: var(--accent); margin-top: 5px; }
+        
+        input { 
+            background-color: var(--panel-bg); color: var(--text-color); 
+            border: 1px solid #444; padding: 12px; border-radius: 4px; 
+            font-family: inherit; font-size: 16px; 
+        }
+        
+        button { 
+            background-color: var(--accent); color: var(--bg-color); 
+            border: none; padding: 15px; font-weight: bold; 
+            cursor: pointer; border-radius: 4px; font-family: inherit; 
+            font-size: 16px;
+        }
+        
+        .card { background: var(--panel-bg); padding: 12px; border-radius: 4px; border: 1px solid #333; margin-bottom: 10px; }
+        .card h2 { font-size: 0.8rem; margin: 0 0 10px 0; color: var(--accent); border-bottom: 1px solid #444; padding-bottom: 5px; }
+        .list { list-style: none; padding: 0; margin: 0; font-size: 0.9rem; }
+        .list li { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #333; }
+        
+        .result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        @media (max-width: 600px) { .result-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Word Analysis</h1>
+    <textarea id="mainText" placeholder="物語を紡いでください..."></textarea>
+    
+    <div class="controls">
+        <span class="label">Check List / 指定検索ワード</span>
+        <input type="text" id="targetWords" value="だった だろう そして けれど">
+        <button onclick="analyze()">深淵を覗き、解析する</button>
+    </div>
+
+    <div class="card">
+        <h2>Ending / 文末の連続重複</h2>
+        <ul id="endingResult" class="list"></ul>
+    </div>
+
+    <div class="result-grid">
+        <div class="card">
+            <h2>Specific / 指定検索結果</h2>
+            <ul id="specificResult" class="list"></ul>
+        </div>
+        <div class="card">
+            <h2>Auto Rank / 頻出（漢字・カタカナ）</h2>
+            <ul id="autoResult" class="list"></ul>
+        </div>
+    </div>
+</div>
+
+<script>
+function analyze() {
+    const text = document.getElementById('mainText').value;
+    if (!text) return;
+
+    // 1. 文末チェック
+    const endingResult = document.getElementById('endingResult');
+    endingResult.innerHTML = "";
+    const sentences = text.split(/[。！？\n]/).filter(s => s.trim().length > 0);
+    let lastEnds = [];
+    let alerts = [];
+    sentences.forEach((s, i) => {
+        const lastThree = s.trim().slice(-3);
+        if (lastEnds.length > 0 && lastThree.length > 0 && lastEnds[lastEnds.length - 1] === lastThree) {
+            let count = 2;
+            let j = lastEnds.length - 2;
+            while(j >= 0 && lastEnds[j] === lastThree) { count++; j--; }
+            if (count >= 3) alerts.push(`「...${lastThree}」が ${count}回 連続（${i+1}句付近）`);
+        }
+        lastEnds.push(lastThree);
+    });
+    endingResult.innerHTML = alerts.length === 0 ? "<li><span>均衡は保たれています。</span></li>" : [...new Set(alerts)].map(a => `<li style="color:var(--warning)">${a}</li>`).join("");
+
+    // 2. 指定検索（「だった」「だろう」などがここに出ます）
+    const input = document.getElementById('targetWords').value;
+    const targets = input.split(/[\s,、]+/).filter(s => s.length > 0);
+    document.getElementById('specificResult').innerHTML = targets.map(word => {
+        const count = (text.match(new RegExp(word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), "g")) || []).length;
+        return `<li><span>${word}</span><span style="color:var(--accent)">${count}回</span></li>`;
+    }).join("");
+
+    // 3. 自動抽出（ノイズ除去版）
+    const segmenter = new Intl.Segmenter('ja-JP', { granularity: 'word' });
+    const segments = segmenter.segment(text);
+    const counts = {};
+    const isKanjiKatakana = /[\u4E00-\u9FFF\u30A1-\u30FC]/;
+
+    for (const { segment, isWordLike } of segments) {
+        if (isWordLike && segment.length >= 2 && isKanjiKatakana.test(segment)) {
+            counts[segment] = (counts[segment] || 0) + 1;
+        }
+    }
+    const ranking = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 15);
+    document.getElementById('autoResult').innerHTML = ranking.map(([word, count]) => `<li><span>${word}</span><span style="color:var(--accent)">${count}</span></li>`).join("");
+}
+</script>
+
+</body>
+</html>

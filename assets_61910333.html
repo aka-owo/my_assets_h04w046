@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="robots" content="noindex, nofollow, noarchive">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Balance Analyzer - Ancient Style</title>
+<style>
+    :root {
+        --bg-color: #0d0d0e;       /* より深い漆黒 */
+        --panel-bg: #1a1a1c;      /* パネル背景 */
+        --accent: #a08c5b;        /* 真鍮・黄金 */
+        --text-color: #d1d1d1;    /* メインテキスト */
+        --border-color: #333;     /* 境界 */
+        
+        /* 魂の濃度を変えたパープル・グラデーション（ゴールドと相性の良い深紫） */
+        --deep-purple: #1e142d;
+        --royal-purple: #2d1b4d;
+        --ancient-glow: #7c5cad;   /* 魔力の輝き */
+        
+        --kanji-color: #5b3d8c;   /* 漢字：重厚な紫 */
+        --hira-color: #7c5cad;    /* ひらがな：鮮やかな紫 */
+        --kata-color: #9d81c4;    /* カタカナ：淡い紫 */
+    }
+
+    body {
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        font-family: "Sawarabi Mincho", "Hiragino Mincho ProN", "Yu Mincho", serif;
+        margin: 0;
+        padding: 15px;
+        box-sizing: border-box;
+        font-size: 16px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .container {
+        max-width: 900px;
+        margin: 0 auto;
+        width: 100%;
+    }
+
+    h1 {
+        color: var(--accent);
+        font-size: 1.2rem;
+        text-align: center;
+        letter-spacing: 0.3rem;
+        margin-bottom: 20px;
+        text-transform: uppercase;
+        text-shadow: 0 0 10px rgba(160, 140, 91, 0.4);
+    }
+
+    /* iPhone対策：16px */
+    textarea {
+        width: 100%;
+        height: 250px;
+        background-color: var(--panel-bg);
+        color: #e0e0e0;
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        padding: 12px;
+        font-size: 16px;
+        line-height: 1.7;
+        box-sizing: border-box;
+        outline: none;
+        font-family: inherit;
+        transition: all 0.3s ease;
+        -webkit-appearance: none;
+    }
+
+    textarea:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 15px rgba(124, 92, 173, 0.2);
+    }
+
+    /* グラフコンテナ */
+    .chart-container {
+        margin: 20px 0;
+        height: 10px;
+        display: flex;
+        background: #000;
+        border-radius: 5px;
+        overflow: hidden;
+        border: 1px solid var(--border-color);
+    }
+
+    .chart-bar { height: 100%; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
+    .bar-kanji { background: var(--kanji-color); }
+    .bar-hira  { background: var(--hira-color); }
+    .bar-kata  { background: var(--kata-color); }
+    .bar-other { background: #444; }
+
+    /* 結果カードのグリッド */
+    .result-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        margin-top: 15px;
+    }
+
+    .stat-card {
+        padding: 18px 15px;
+        border-radius: 4px;
+        border: 1px solid rgba(160, 140, 91, 0.2); /* ゴールドの細い枠 */
+        text-align: center;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* 背景：ブラックから紫へのグラデーション */
+    .kanji { background: linear-gradient(135deg, #1a1a1c 0%, #2a1b3d 100%); border-bottom: 2px solid var(--kanji-color); }
+    .hiragana { background: linear-gradient(135deg, #1a1a1c 0%, #352649 100%); border-bottom: 2px solid var(--hira-color); }
+    .katakana { background: linear-gradient(135deg, #1a1a1c 0%, #403255 100%); border-bottom: 2px solid var(--kata-color); }
+    .others { background: linear-gradient(135deg, #1a1a1c 0%, #252527 100%); border-bottom: 2px solid #555; }
+
+    .label {
+        font-size: 0.75rem;
+        margin-bottom: 8px;
+        color: var(--accent); /* ゴールドのラベル */
+        letter-spacing: 0.15rem;
+        font-weight: bold;
+    }
+
+    .value {
+        font-size: 2.2rem;
+        font-weight: bold;
+        color: #fff;
+        display: block;
+        margin-bottom: 4px;
+        font-family: 'Georgia', serif;
+        text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    }
+
+    .percentage {
+        font-size: 1rem;
+        color: var(--text-color);
+        opacity: 0.7;
+    }
+
+    /* アドバイスエリア */
+    .advice {
+        margin-top: 25px;
+        padding: 20px;
+        background: linear-gradient(90deg, #1a1a1c 0%, var(--deep-purple) 100%);
+        border-left: 3px solid var(--accent);
+        font-size: 0.95rem;
+        line-height: 1.8;
+        color: var(--text-color);
+        font-style: italic;
+        border-radius: 0 4px 4px 0;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+
+    @media (max-width: 600px) {
+        .result-grid { grid-template-columns: 1fr; }
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Ancient Balance Analyzer</h1>
+    
+    <textarea id="sourceText" placeholder="言葉を紡げ。我らが歩んだ道の如く……" oninput="analyze()"></textarea>
+
+    <div class="chart-container" id="chart">
+        <div id="bar-kanji" class="chart-bar" style="width: 0%"></div>
+        <div id="bar-hira" class="chart-bar" style="width: 0%"></div>
+        <div id="bar-kata" class="chart-bar" style="width: 0%"></div>
+        <div id="bar-other" class="chart-bar" style="width: 0%"></div>
+    </div>
+
+    <div class="result-grid">
+        <div class="stat-card kanji">
+            <div class="label">漢字 / KANJI</div>
+            <div id="val-kanji" class="value">0</div>
+            <div id="pct-kanji" class="percentage">0%</div>
+        </div>
+        <div class="stat-card hiragana">
+            <div class="label">ひらがな / HIRA</div>
+            <div id="val-hira" class="value">0</div>
+            <div id="pct-hira" class="percentage">0%</div>
+        </div>
+        <div class="stat-card katakana">
+            <div class="label">カタカナ / KATA</div>
+            <div id="val-kata" class="value">0</div>
+            <div id="pct-kata" class="percentage">0%</div>
+        </div>
+        <div class="stat-card others">
+            <div class="label">記号・他 / ETC</div>
+            <div id="val-other" class="value">0</div>
+            <div id="pct-other" class="percentage">0%</div>
+        </div>
+    </div>
+
+    <div id="advice-text" class="advice">
+        ……さて、お前が綴る言葉には、どれほどの重みがあるのかな？
+    </div>
+</div>
+
+<script>
+function analyze() {
+    const text = document.getElementById('sourceText').value;
+    if (!text) {
+        resetView();
+        return;
+    }
+
+    const kanji = text.match(/[\u4e00-\u9faf\u3400-\u4dbf]|[\u{20000}-\u{2EBEF}]/gu) || [];
+    const hira = text.match(/[\u3040-\u309f]/g) || [];
+    const kata = text.match(/[\u30a0-\u30ff]/g) || [];
+    const total = text.length;
+    const othersCount = total - (kanji.length + hira.length + kata.length);
+
+    const stats = {
+        kanji: { count: kanji.length, pct: (kanji.length / total * 100).toFixed(1) },
+        hira: { count: hira.length, pct: (hira.length / total * 100).toFixed(1) },
+        kata: { count: kata.length, pct: (kata.length / total * 100).toFixed(1) },
+        other: { count: othersCount, pct: (othersCount / total * 100).toFixed(1) }
+    };
+
+    updateView(stats);
+    generateAdvice(stats);
+}
+
+function resetView() {
+    ['kanji', 'hira', 'kata', 'other'].forEach(id => {
+        document.getElementById(`val-${id}`).innerText = "0";
+        document.getElementById(`pct-${id}`).innerText = "0%";
+        document.getElementById(`bar-${id}`).style.width = "0%";
+    });
+    document.getElementById('advice-text').innerText = "……さて、お前が綴る言葉には、どれほどの重みがあるのかな？";
+}
+
+function updateView(s) {
+    const types = ['kanji', 'hira', 'kata', 'other'];
+    types.forEach(type => {
+        document.getElementById(`val-${type}`).innerText = s[type].count;
+        document.getElementById(`pct-${type}`).innerText = s[type].pct + "%";
+        document.getElementById(`bar-${type}`).style.width = s[type].pct + "%";
+        
+        const bar = document.getElementById(`bar-${type}`);
+        bar.className = 'chart-bar bar-' + type;
+    });
+}
+
+function generateAdvice(s) {
+    let advice = "";
+    const k = parseFloat(s.kanji.pct);
+    
+    if (k > 40) {
+        advice = "<strong>【強き意志】</strong> 漢字の比率が高いな。重厚だが、読み手に「重圧」を与えすぎるかもしれん。少し言葉をひらき、魂を解放してはどうだ？";
+    } else if (k < 20) {
+        advice = "<strong>【揺らぐ魂】</strong> かなが多すぎるようだ。少しばかり、言葉の重みが足りんのではないか？ 重要な真実には、相応の漢字を充てるべきだ。";
+    } else {
+        advice = "<strong>【黄金の均衡】</strong> 実に良いバランスだ。これこそが言葉の黄金比。読み手の心に、澱みなく真実が届くことだろう。";
+    }
+    document.getElementById('advice-text').innerHTML = advice;
+}
+</script>
+
+</body>
+</html>

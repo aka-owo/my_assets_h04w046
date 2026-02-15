@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="robots" content="noindex, nofollow, noarchive">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>一太郎HTML (Stability Edition)</title>
+    <style>
+:root { 
+    --font-size: 16px; 
+    --ten: 23mm; --chi: 17mm; --nodo: 20mm; --koguchi: 15mm;
+    --bg-dark: #121015;
+    --panel-bg: #1e1b24;
+    --accent-gold: #b0945d;
+    --magic-purple: #4a3b63;
+    --text-light: #d1cedb;
+    --page-white: #fdfdfd;
+}
+
+body { 
+    margin: 0; 
+    background-color: var(--bg-dark); 
+    color: var(--text-light);
+    font-family: -apple-system, "Hiragino Kaku Gothic ProN", sans-serif; 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    /* ここを追加 */
+    width: 100%;
+}
+
+/* 操作パネル */
+#ui-area { 
+    width: 100%; 
+    background: var(--panel-bg); 
+    padding: 15px; 
+    box-sizing: border-box; 
+    position: sticky; 
+    top: 0; 
+    z-index: 100; 
+    box-shadow: 0 4px 20px rgba(0,0,0,0.6); 
+    border-bottom: 2px solid var(--magic-purple);
+    transition: transform 0.3s ease-in-out;
+}
+
+/* パネル折りたたみ状態 */
+#ui-area.collapsed #ui-content { display: none; }
+
+/* 開閉トグルボタン */
+#ui-toggle {
+    text-align: center;
+    cursor: pointer;
+    font-size: 12px;
+    color: var(--accent-gold);
+    margin-bottom: 10px;
+    user-select: none;
+}
+
+textarea { 
+    width: 100%; 
+    height: 120px; 
+    margin-bottom: 15px; 
+    font-size: 16px; 
+    background-color: #2a2631;
+    color: #fff;
+    border: 1px solid var(--magic-purple); 
+    border-radius: 10px; 
+    padding: 12px; 
+    box-sizing: border-box;
+    outline: none;
+}
+
+.settings-grid { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); 
+    gap: 12px; 
+    font-size: 11px; 
+    align-items: end; 
+}
+
+.settings-item { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 5px; 
+    color: var(--accent-gold); 
+    font-weight: bold;
+}
+
+input { 
+    width: 100%; 
+    padding: 8px; 
+    font-size: 16px; 
+    background: #2a2631;
+    color: #fff;
+    border: 1px solid #444;
+    border-radius: 6px;
+    box-sizing: border-box; 
+}
+
+button { 
+    padding: 14px; 
+    background: linear-gradient(135deg, var(--magic-purple), #2d1f42); 
+    color: var(--accent-gold); 
+    border: 1px solid var(--accent-gold); 
+    border-radius: 12px; 
+    cursor: pointer; 
+    font-weight: bold; 
+    font-size: 16px;
+    grid-column: 1 / -1; 
+}
+
+/* 文字数カウンター */
+#char-count {
+    font-size: 12px;
+    color: var(--text-light);
+    margin-left: 10px;
+}
+
+#output-container { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 40px; 
+    padding: 40px 10px; 
+    align-items: center; 
+    width: 100%;
+}
+
+.page { 
+    background: var(--page-white); 
+    color: #1a1a1a;
+    writing-mode: vertical-rl; 
+    -webkit-writing-mode: vertical-rl; 
+    font-family: "Hiragino Mincho ProN", "Yu Mincho", serif; 
+    font-size: var(--font-size); 
+    box-sizing: border-box; 
+    height: calc((var(--font-size) * var(--max-chars)) + var(--ten) + var(--chi));
+    position: relative;
+    box-shadow: 0 0 30px rgba(74, 59, 99, 0.4);
+    display: block; 
+    margin: 0 auto; 
+    padding-top: var(--ten);
+    padding-bottom: var(--chi);
+    overflow: hidden; 
+}
+
+.page:not(.even-page) { padding-right: var(--nodo); padding-left: var(--koguchi); }
+.page.even-page { padding-left: var(--nodo); padding-right: var(--koguchi); }
+
+.line-block { 
+    display: block; 
+    float: right;  
+    width: calc(var(--font-size) * var(--line-height)); 
+    height: 100%; 
+    line-height: 1; 
+    white-space: nowrap;
+}
+
+.page.even-page::before {
+    content: "";
+    display: block;
+    float: right;
+    width: calc(101% - (var(--font-size) * var(--line-height) * var(--lines-count, 17)));
+    height: 100%;
+}
+
+.page-header {
+    position: absolute; top: calc(var(--ten) / 2.5); font-size: 11px;
+    writing-mode: horizontal-tb; color: #888; display: flex; gap: 1.5em; white-space: nowrap; z-index: 10;
+}
+.page:not(.even-page) .page-header { left: 10mm; }
+.page.even-page .page-header { right: 10mm; flex-direction: row-reverse; }
+
+.custom-ruby { display: inline-block; position: relative; line-height: 1; vertical-align: top; }
+.ruby-base { display: inline; }
+.ruby-text {
+    position: absolute; right: -1.1em; top: 0; width: 0.5em; height: 100%;
+    font-size: 0.5em; line-height: 1.1; display: flex; flex-direction: column; 
+    justify-content: space-around; text-align: center; font-family: sans-serif; 
+    color: #444; white-space: nowrap;
+}
+
+@media print {
+    body { background-color: white; color: black; }
+    #ui-area { display: none; }
+    #output-container { gap: 0; padding: 0; }
+    .page { box-shadow: none; page-break-after: always; margin: 0; }
+}
+
+/* モバイル対応：iPhone/Safari用調整 */
+@media screen and (max-width: 480px) {
+    :root {
+        --font-size: 14px;
+        --ten: 15mm; 
+        --chi: 12mm;
+        --nodo: 10mm;
+        --koguchi: 5mm;
+    }
+
+    #output-container {
+        padding-top: 50px !important;
+        padding-bottom: 0 !important;
+        padding-left: 0 !important;  /* 左右のパディングを完全にゼロにする */
+        padding-right: 0 !important;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center; /* 横方向の中央揃え */
+        overflow-x: hidden;  /* 画面全体の横揺れを防止 */
+    }
+
+    .page-wrap {
+        /* 紙の親要素を画面幅いっぱいにし、中身を中央に寄せる */
+        width: 100%;
+        display: flex;
+        justify-content: center; 
+        align-items: flex-start;
+        margin-bottom: -40px;
+        overflow: hidden; /* 中の scale した page が悪さをしないように止める */
+    }
+
+    .page {
+        /* JSで計算された幅を維持しつつ、はみ出しを許容しない設定 */
+        flex-shrink: 0;
+        transform: scale(0.7); /* 画面に収めるための倍率（機種に合わせて0.8〜0.9で調整） */
+        transform-origin: center top; /* 中央を軸に縮小することで、右端の消失を防ぐ */
+        padding-top: var(--ten) !important;
+        padding-bottom: var(--chi) !important;
+    }
+
+    /* 1行目（右端）が隠れないように、奇数・偶数ページ共通でパディングを死守 */
+    .page:not(.even-page) { 
+        padding-right: var(--nodo) !important; 
+                    /* var(--nodo) を直接 3mm や 5mm という数値に変えてみてください */
+    padding-right: 10.5mm !important; 
+        padding-left: var(--koguchi) !important; 
+    }
+    .page.even-page { 
+        padding-left: var(--nodo) !important; 
+        padding-right: var(--koguchi) !important; 
+    }
+
+/* 設定グリッドの調整 */
+    .settings-grid {
+        grid-template-columns: repeat(3, 1fr); /* 天地ノドなどを3列でコンパクトに */
+        gap: 8px;
+    }
+
+    /* 作品タイトルの項目だけを、グリッドの端から端まで使う設定に変更 */
+    .settings-item:last-of-type {
+        grid-column: 1 / -1; /* 横いっぱいに広げる */
+        margin-top: 10px;    /* 上の項目との間に少し隙間を作る */
+    }
+
+    /* 入力ボックス自体の横幅を自動調整にする */
+    #pTitle {
+        width: 100% !important; 
+        box-sizing: border-box;
+    }
+}
+    </style>
+</head>
+<body>
+
+<div id="ui-area">
+    <div id="ui-toggle" onclick="toggleUI()">▲ パネルを閉じる / 展開</div>
+    <div id="ui-content">
+        <textarea id="inputText" placeholder="文章を貼り付けてください" oninput="updateCharCount()"></textarea>
+        <div class="settings-grid">
+            <div class="settings-item"><label>1行文字数</label><input type="number" id="chars" value="42"></div>
+            <div class="settings-item"><label>1ページ行数</label><input type="number" id="lines" value="17"></div>
+            <div class="settings-item"><label>行間倍率</label><input type="number" id="lHeight" value="1.8" step="0.1"></div>
+            <div class="settings-item"><label>天(上)mm</label><input type="number" id="mTen" value="23"></div>
+            <div class="settings-item"><label>地(下)mm</label><input type="number" id="mChi" value="17"></div>
+            <div class="settings-item"><label>ノドmm</label><input type="number" id="mNodo" value="20"></div>
+            <div class="settings-item"><label>小口mm</label><input type="number" id="mKoguchi" value="15"></div>
+            <div class="settings-item">
+                <label>作品タイトル <span id="char-count">0文字</span></label>
+                <input type="text" id="pTitle" value="作品タイトル" style="width: 120px;">
+            </div>
+            <button onclick="layoutText()">ページ生成</button>
+        </div>
+    </div>
+</div>
+
+<div id="output-container"></div>
+
+<script>
+const HEAD_KINSOKU = "」』）｝】＞≫］ぁぃぅぇぉっゃゅょァィゥェォッャュョ・ー―-、。,.ゝ々！？：；／";
+const TAIL_KINSOKU = "「『（｛【＜≪［";
+const NO_SPLIT = ["……", "――"];
+
+// パネル開閉
+function toggleUI() {
+    const ui = document.getElementById('ui-area');
+    const toggle = document.getElementById('ui-toggle');
+    ui.classList.toggle('collapsed');
+    toggle.innerText = ui.classList.contains('collapsed') ? "▼ パネルを展開" : "▲ パネルを閉じる";
+}
+
+// 文字数カウント
+function updateCharCount() {
+    const text = document.getElementById('inputText').value;
+    const count = text.replace(/\s/g, "").length;
+    document.getElementById('char-count').innerText = count + "文字";
+}
+
+function layoutText() {
+    let text = document.getElementById('inputText').value;
+    const container = document.getElementById('output-container');
+    const charsPerLine = parseInt(document.getElementById('chars').value);
+    const linesPerPage = parseInt(document.getElementById('lines').value);
+    const lineHeight = parseFloat(document.getElementById('lHeight').value);
+    const title = document.getElementById('pTitle').value;
+
+    // スマホの時は、入力値に関わらず余白を強制固定する
+const isMobile = window.innerWidth <= 480;
+
+    const ten = isMobile ? "15mm" : document.getElementById('mTen').value + 'mm';
+    const chi = isMobile ? "12mm" : document.getElementById('mChi').value + 'mm';
+    const nodo = isMobile ? "10mm" : document.getElementById('mNodo').value + 'mm';
+    const koguchi = isMobile ? "5mm" : document.getElementById('mKoguchi').value + 'mm';
+
+    document.documentElement.style.setProperty('--ten', document.getElementById('mTen').value + 'mm');
+    document.documentElement.style.setProperty('--chi', document.getElementById('mChi').value + 'mm');
+    document.documentElement.style.setProperty('--nodo', document.getElementById('mNodo').value + 'mm');
+    document.documentElement.style.setProperty('--koguchi', document.getElementById('mKoguchi').value + 'mm');
+    
+    container.innerHTML = "";
+    if (!text) return;
+    text = text.replace(/^---[\s\S]*?---\n*/, "");
+    document.documentElement.style.setProperty('--line-height', lineHeight);
+    document.documentElement.style.setProperty('--max-chars', charsPerLine);
+
+    const paragraphs = text.split(/\r?\n/);
+    let currentPage = createNewPage(container, linesPerPage, charsPerLine, lineHeight, title);
+    let currentLineInPage = 0;
+
+    function pushLine(html) {
+        if (currentLineInPage >= linesPerPage) {
+            currentPage = createNewPage(container, linesPerPage, charsPerLine, lineHeight, title);
+            currentLineInPage = 0;
+        }
+        const div = document.createElement('div');
+        div.className = 'line-block';
+        div.innerHTML = html;
+        currentPage.appendChild(div);
+        currentLineInPage++;
+    }
+
+    paragraphs.forEach((pText) => {
+        pText = pText.trim();
+        if (pText === "") { pushLine("<br>"); return; }
+        let workingText = (!/^[　「『（(]/.test(pText)) ? "　" + pText : pText;
+        let tokens = [];
+        for (let i = 0; i < workingText.length; i++) {
+            if (workingText[i] === "｜") {
+                let sStart = workingText.indexOf("《", i);
+                let sEnd = workingText.indexOf("》", sStart);
+                if (sStart !== -1 && sEnd !== -1 && sStart > i && (sStart - i) < 15) {
+                    let oya = workingText.substring(i + 1, sStart);
+                    let rubi = workingText.substring(sStart + 1, sEnd);
+                    tokens.push({ html: `<span class="custom-ruby"><span class="ruby-base">${oya}</span><span class="ruby-text">${rubi}</span></span>`, text: oya, len: oya.length });
+                    i = sEnd; continue;
+                }
+            }
+            let matchedSplit = NO_SPLIT.find(s => workingText.startsWith(s, i));
+            if (matchedSplit) {
+                tokens.push({ html: matchedSplit, text: matchedSplit, len: 2 });
+                i += matchedSplit.length - 1; continue;
+            }
+            tokens.push({ html: workingText[i], text: workingText[i], len: 1 });
+        }
+
+        let lineBuffer = [];
+        let currentLen = 0;
+        for (let i = 0; i < tokens.length; i++) {
+            lineBuffer.push(tokens[i].html);
+            currentLen += tokens[i].len;
+            if (currentLen >= charsPerLine) {
+                let next = (i + 1 < tokens.length) ? tokens[i+1].text : "";
+                if (next && next.length === 1 && HEAD_KINSOKU.includes(next)) {
+                    lineBuffer.push(tokens[i+1].html); i++;
+                } else if (TAIL_KINSOKU.includes(tokens[i].text)) {
+                    let last = lineBuffer.pop();
+                    pushLine(lineBuffer.join(''));
+                    lineBuffer = [last]; currentLen = tokens[i].len; continue;
+                }
+                pushLine(lineBuffer.join(''));
+                lineBuffer = []; currentLen = 0;
+            }
+        }
+        if (lineBuffer.length > 0) pushLine(lineBuffer.join(''));
+    });
+
+    while (currentLineInPage > 0 && currentLineInPage < linesPerPage) {
+        pushLine("&nbsp;"); 
+    }
+}
+
+function createNewPage(container, lines, chars, lh, title) {
+    const pageNum = container.children.length + 1;
+    const wrap = document.createElement('div');
+    wrap.className = 'page-wrap';
+    const page = document.createElement('div');
+    const isEven = pageNum % 2 === 0;
+    
+    page.className = 'page' + (isEven ? ' even-page' : '');
+    page.style.setProperty('--lines-count', lines);
+
+    const isMobile = window.innerWidth <= 480;
+    
+    // JS側でもスマホ用の余白数値を同期させる
+    const mNodo = isMobile ? 10 : document.getElementById('mNodo').value;
+    const mKoguchi = isMobile ? 5 : document.getElementById('mKoguchi').value;
+    const fSize = isMobile ? 14 : 16; 
+    const lineWidthPx = fSize * lh;
+    
+    // 幅の計算。端の行が消えないよう +30px ほど余裕を持たせる
+    page.style.width = `calc(${lineWidthPx * lines}px + ${mNodo}mm + ${mKoguchi}mm + 30px)`;
+
+    page.innerHTML = `<div class="page-header"><span>${pageNum}</span><span>${title}</span></div>`;
+
+    wrap.appendChild(page);
+    container.appendChild(wrap);
+    return page;
+}
+</script>
+</body>
+</html>

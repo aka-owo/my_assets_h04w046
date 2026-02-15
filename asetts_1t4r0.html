@@ -215,12 +215,8 @@ button {
         flex-shrink: 0;
         transform: scale(0.7); /* 画面に収めるための倍率（機種に合わせて0.8〜0.9で調整） */
         transform-origin: center top; /* 中央を軸に縮小することで、右端の消失を防ぐ */
-        
-        /* 右端が画面にめり込まないよう、最小限のマージンを確保 */
-        margin-right: 0;
-        margin-left: 0;
-
-        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        padding-top: var(--ten) !important;
+        padding-bottom: var(--chi) !important;
     }
 
     /* 1行目（右端）が隠れないように、奇数・偶数ページ共通でパディングを死守 */
@@ -287,6 +283,14 @@ function layoutText() {
     const linesPerPage = parseInt(document.getElementById('lines').value);
     const lineHeight = parseFloat(document.getElementById('lHeight').value);
     const title = document.getElementById('pTitle').value;
+
+    // スマホの時は、入力値に関わらず余白を強制固定する
+const isMobile = window.innerWidth <= 480;
+
+    const ten = isMobile ? "15mm" : document.getElementById('mTen').value + 'mm';
+    const chi = isMobile ? "12mm" : document.getElementById('mChi').value + 'mm';
+    const nodo = isMobile ? "10mm" : document.getElementById('mNodo').value + 'mm';
+    const koguchi = isMobile ? "5mm" : document.getElementById('mKoguchi').value + 'mm';
 
     document.documentElement.style.setProperty('--ten', document.getElementById('mTen').value + 'mm');
     document.documentElement.style.setProperty('--chi', document.getElementById('mChi').value + 'mm');
@@ -375,21 +379,16 @@ function createNewPage(container, lines, chars, lh, title) {
     page.className = 'page' + (isEven ? ' even-page' : '');
     page.style.setProperty('--lines-count', lines);
 
-    // --- ここから修正：iPhone（画面幅480px以下）かどうかの判定 ---
     const isMobile = window.innerWidth <= 480;
     
-    // スマホの時はJS側の計算用数値も小さくする
+    // JS側でもスマホ用の余白数値を同期させる
     const mNodo = isMobile ? 10 : document.getElementById('mNodo').value;
     const mKoguchi = isMobile ? 5 : document.getElementById('mKoguchi').value;
-    
-    // 1行の幅を計算（フォントサイズはCSSの--font-sizeと合わせる）
     const fSize = isMobile ? 14 : 16; 
     const lineWidthPx = fSize * lh;
     
-    // 紙の横幅を正しく計算（行数分 + 左右余白）
-    // 1px程度の計算誤差で消えないよう、+2pxの遊びを持たせる
-    page.style.width = `calc(${lineWidthPx * lines}px + ${mNodo}mm + ${mKoguchi}mm + 2px)`;
-    // --- 修正ここまで ---
+    // 幅の計算。端の行が消えないよう +30px ほど余裕を持たせる
+    page.style.width = `calc(${lineWidthPx * lines}px + ${mNodo}mm + ${mKoguchi}mm + 30px)`;
 
     page.innerHTML = `<div class="page-header"><span>${pageNum}</span><span>${title}</span></div>`;
 

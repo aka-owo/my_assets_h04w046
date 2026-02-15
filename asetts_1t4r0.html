@@ -232,6 +232,24 @@ button {
         padding-left: var(--nodo) !important; 
         padding-right: var(--koguchi) !important; 
     }
+
+/* 設定グリッドの調整 */
+    .settings-grid {
+        grid-template-columns: repeat(3, 1fr); /* 天地ノドなどを3列でコンパクトに */
+        gap: 8px;
+    }
+
+    /* 作品タイトルの項目だけを、グリッドの端から端まで使う設定に変更 */
+    .settings-item:last-of-type {
+        grid-column: 1 / -1; /* 横いっぱいに広げる */
+        margin-top: 10px;    /* 上の項目との間に少し隙間を作る */
+    }
+
+    /* 入力ボックス自体の横幅を自動調整にする */
+    #pTitle {
+        width: 100% !important; 
+        box-sizing: border-box;
+    }
 }
     </style>
 </head>

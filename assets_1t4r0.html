@@ -17,6 +17,11 @@
     --page-white: #fdfdfd;
 }
 
+html {
+    height: 100%;
+    overflow-y: scroll; /* 常に垂直スクロールバーの領域を確保（震え防止） */
+}
+
 body { 
     margin: 0; 
     background-color: var(--bg-dark); 
@@ -25,8 +30,10 @@ body {
     display: flex; 
     flex-direction: column; 
     align-items: center; 
-    /* ここを追加 */
     width: 100%;
+    /* --- ここを追加 --- */
+    -webkit-overflow-scrolling: touch; /* スクロールを慣性付きで滑らかに */
+    overscroll-behavior-y: none;      /* 縦方向の余計なバウンス（引っかかり）を抑制 */
 }
 
 /* 操作パネル */
@@ -197,8 +204,8 @@ button {
     }
 
     #output-container {
-        padding-top: 50px !important;
-        padding-bottom: 0 !important;
+        padding-top: 80px !important;
+        padding-bottom: 50px !important;
         padding-left: 0 !important;  /* 左右のパディングを完全にゼロにする */
         padding-right: 0 !important;
         width: 100%;

@@ -25,6 +25,8 @@ body {
     display: flex; 
     flex-direction: column; 
     align-items: center; 
+    /* ここを追加 */
+    width: 100%;
 }
 
 /* 操作パネル */
@@ -196,6 +198,9 @@ button {
 
     #output-container {
         padding-top: 50px !important;
+        padding-bottom: 0 !important;
+        padding-left: 0 !important;  /* 左右のパディングを完全にゼロにする */
+        padding-right: 0 !important;
         width: 100%;
         display: flex;
         flex-direction: column;
@@ -205,11 +210,12 @@ button {
 
     .page-wrap {
         /* 紙の親要素を画面幅いっぱいにし、中身を中央に寄せる */
-        width: 100vw;
+        width: 100%;
         display: flex;
         justify-content: center; 
         align-items: flex-start;
         margin-bottom: -40px;
+        overflow: hidden; /* 中の scale した page が悪さをしないように止める */
     }
 
     .page {

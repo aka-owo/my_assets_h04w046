@@ -204,6 +204,8 @@ button {
     }
 
     #output-container {
+    /* ページ同士の隙間を 40px から 10px くらいに詰める */
+        gap: 10px !important;
         padding-top: 80px !important;
         padding-bottom: 50px !important;
         padding-left: 0 !important;  /* 左右のパディングを完全にゼロにする */
@@ -221,14 +223,16 @@ button {
         display: flex;
         justify-content: center; 
         align-items: flex-start;
-        margin-bottom: -40px;
-        overflow-x: hidden; /* 中の scale した page が悪さをしないように止める */
+/* 縮小(scale)によって生じる余分な空白をネガティブマージンで相殺 */
+        /* 文字が見切れない範囲で -80px 〜 -100px くらいまで攻められます */
+        margin-bottom: -90px !important; 
+        overflow: hidden;
     }
 
     .page {
         /* JSで計算された幅を維持しつつ、はみ出しを許容しない設定 */
         flex-shrink: 0;
-        transform: scale(0.7); /* 画面に収めるための倍率（機種に合わせて0.8〜0.9で調整） */
+        transform: scale(0.7); /* 画面に収めるための倍率（機種に合わせて0.7〜0.9で調整） */
         transform-origin: center top; /* 中央を軸に縮小することで、右端の消失を防ぐ */
         padding-top: var(--ten) !important;
         padding-bottom: var(--chi) !important;

@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="robots" content="noindex,nofollow,noarchive">
+    <title>AMNOS - 5×26</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* 全体のリセット */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            
+            /* 🍯 背景：ミルクホワイト × シトラスハニー のハッピーブレンド */
+            background: linear-gradient(180deg, #ffffff 0%, #fffdf4 40%, #fef3c7 100%);
+            
+            background-attachment: fixed;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 25px 16px;
+        }
+
+        /* メインコンテナ（すりガラス効果） */
+        .container {
+            width: 100%;
+            max-width: 440px;
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 24px;
+            padding: 30px 20px;
+            box-shadow: 0 10px 30px rgba(234, 179, 8, 0.08); 
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+        }
+
+        /* ヘッダーエリア */
+        header {
+            margin-bottom: 28px;
+        }
+        
+        /* 🚌 5×20バスエンブレムの土台 */
+        .header-badge {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 90px;
+            height: 60px;
+            margin-bottom: 12px;
+            margin-top: 15px;
+        }
+        .badge-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 10px;
+            background: linear-gradient(to top, 
+                #6d4c41 0%, #6d4c41 33.33%,  
+                #81d4fa 33.33%, #81d4fa 66.66%, 
+                #f48fb1 66.66%, #f48fb1 100%   
+            );
+            border: 3px solid #ffffff;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.12);
+        }
+        
+        /* 👑 上へ大きく飛び出させたゴールドの王冠 */
+        .crown-icon {
+            position: relative;
+            z-index: 2;
+            font-size: 2.4rem; 
+            color: #f39c12; 
+            transform: translateY(-2.5rem); 
+            filter: drop-shadow(0 0 4px #ffffff) drop-shadow(0 3px 5px rgba(0, 0, 0, 0.2));
+        }
+        
+        h1 {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: #2c3e50;
+            letter-spacing: 0.08em;
+        }
+        p.subtitle {
+            font-size: 0.8rem;
+            color: #7f8c8d;
+            font-weight: 500;
+            margin-top: 4px;
+            letter-spacing: 0.05em;
+        }
+
+        /* リンクボタンのリスト */
+        .link-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* ボタンの共通スタイル */
+        .btn {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 18px;
+            border-radius: 16px;
+            text-decoration: none;
+            color: #fff;
+            box-shadow: 0 4px 0px rgba(0, 0, 0, 0.12);
+            transition: all 0.1s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        /* タップした時の沈み込み */
+        .btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 左側の星とテキストエリア */
+        .btn-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            text-align: left;
+        }
+
+        /* ★星マークのグラデーション設定 */
+        .btn-left .fa-star {
+            font-size: 1.25rem;
+            display: inline-block;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 2.5px rgba(255, 255, 255, 0.85));
+        }
+
+        /* ーー 各メンバーの星グラデーション ーー */
+        .star-green  { background: linear-gradient(135deg, #2ecc71, #f1c40f); } 
+        .star-purple { background: linear-gradient(135deg, #bf5af2, #ff64b0); } 
+        .star-yellow { background: linear-gradient(135deg, #ffcc00, #ffffff); } 
+        .star-blue   { background: linear-gradient(135deg, #007aff, #5eddff); } 
+        .star-red    { background: linear-gradient(135deg, #ff453a, #ff9f0a); } 
+
+        /* 5色MIXボタン用の白い星 */
+        .star-white {
+            color: #ffffff;
+            filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.6));
+        }
+
+        .text-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+        }
+        .link-name {
+            font-size: 0.95rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+        }
+        .file-name {
+            font-size: 0.72rem;
+            font-family: 'Courier New', Courier, monospace;
+            opacity: 0.9;
+            font-weight: 700;
+        }
+
+        /* 右側のミニ王冠 */
+        .btn-right .fa-crown {
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+
+        /* ーー ボタン背景のフラットカラー ーー */
+        .btn-green  { background-color: #27ae60; }
+        .btn-purple { background-color: #8e44ad; }
+        .btn-yellow { 
+            background-color: #f39c12; 
+            box-shadow: 0 4px 0px rgba(0, 0, 0, 0.12), 0 0 12px rgba(243, 156, 18, 0.5);
+        }
+        .btn-blue   { background-color: #2980b9; }
+        .btn-red    { background-color: #c0392b; }
+
+        /* 🌈 【キープ！】5色ストライプ（フラットカラー）ボタン */
+        .btn-stripe {
+            background: linear-gradient(to right, 
+                #70A940 0% 20%, 
+                #846E9D 20% 40%, 
+                #E6B101 40% 60%, 
+                #CF5758 60% 80%, 
+                #8AABCC 80% 100%
+            );
+            box-shadow: 0 4px 0px rgba(0, 0, 0, 0.15), 0 0 10px rgba(0, 0, 0, 0.05);
+            margin-top: 15px; /* 個人のボタンと少し距離を置く */
+        }
+
+        /* 📸 【新設】Instagram風にじみグラデーションボタン */
+        .btn-instagram {
+            background: 
+                radial-gradient(circle at 0% 100%, rgba(39, 174, 96, 0.9), transparent 60%),
+                radial-gradient(circle at 30% 0%, rgba(142, 68, 173, 0.85), transparent 65%),
+                radial-gradient(circle at 100% 0%, rgba(243, 156, 18, 0.9), transparent 60%),
+                radial-gradient(circle at 100% 80%, rgba(41, 128, 185, 0.95), transparent 55%),
+                radial-gradient(circle at 50% 100%, rgba(192, 57, 43, 0.9), transparent 60%);
+            background-color: #9b59b6; 
+            box-shadow: 0 4px 0px rgba(0, 0, 0, 0.15), 0 6px 20px rgba(243, 156, 18, 0.35);
+        }
+
+        /* フッター */
+        footer {
+            margin-top: 35px;
+            font-size: 0.75rem;
+            color: #7f8c8d;
+            font-weight: 700;
+        }
+        
+        /* 移動した5色の星の配置調整（ヘッダー用） */
+        .constellation {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            font-size: 0.75rem;
+        }
+        .c-green  { color: #27ae60; }
+        .c-purple { color: #8e44ad; }
+        .c-yellow { color: #f39c12; }
+        .c-blue   { color: #2980b9; }
+        .c-red    { color: #c0392b; }
+
+        /* 縦幅5pxのメンバーカラーボーダー */
+        .member-border {
+            height: 5px;
+            width: 140px;
+            margin: 0 auto 12px;
+            border-radius: 3px;
+            background: linear-gradient(to right, 
+                #70A940 0% 20%, 
+                #846E9D 20% 40%, 
+                #E6B101 40% 60%, 
+                #CF5758 60% 80%, 
+                #8AABCC 80% 100%
+            );
+        }
+    </style>
+    
+    <script>
+        // ページを開いた瞬間にパスワードを入力させる
+        const secretKey = "amnos"; 
+        const userInput = prompt("忘れないでいよう");
+
+        if (userInput !== secretKey) { 
+            alert("パスワードが違います。アクセスできません。");
+            window.location.href = "about:blank"; // 間違えたら真っ白なページに飛ばす
+        }
+    </script>
+    
+</head>
+<body>
+
+    <div class="container">
+        
+        <header>
+            <div class="header-badge">
+                <div class="badge-bg"></div>
+                <i class="fa-solid fa-crown crown-icon"></i>
+            </div>
+            <div class="constellation">
+                <i class="fa-solid fa-star c-green"></i>
+                <i class="fa-solid fa-star c-purple"></i>
+                <i class="fa-solid fa-star c-yellow"></i>
+                <i class="fa-solid fa-star c-blue"></i>
+                <i class="fa-solid fa-star c-red"></i>
+            </div>
+            <h1>Five</h1>
+            <p class="subtitle">★ 1999.9.15 - 2026.5.31 ★</p>
+        </header>
+
+        <div class="link-list">
+
+            <!-- 🌈 【復活！】5色フラットストライプボタン -->
+            <a href="index.html" class="btn btn-stripe">
+                <div class="btn-left">
+                    <i class="fa-solid fa-star star-white"></i>
+                    <div class="text-wrap">
+                        <span class="link-name">Five Index</span>
+                        <span class="file-name">1999.9.15 - 2026.5.31</span>
+                    </div>
+                </div>
+                <div class="btn-right"><i class="fa-solid fa-crown"></i></div>
+            </a>
+
+            <!-- A - 緑 -->
+            <a href="bubun_copy.html" class="btn btn-green">
+                <div class="btn-left">
+                    <i class="fa-solid fa-star star-green"></i>
+                    <div class="text-wrap">
+                        <span class="link-name">部分コピペ</span>
+                        <span class="file-name">bubun_copy - 256264</span>
+                    </div>
+                </div>
+                <div class="btn-right"><i class="fa-solid fa-crown"></i></div>
+            </a>
+
+            <!-- M - 紫 -->
+            <a href="kuhaku_counter.html" class="btn btn-purple">
+                <div class="btn-left">
+                    <i class="fa-solid fa-star star-purple"></i>
+                    <div class="text-wrap">
+                        <span class="link-name">空白・文字数チェッカー</span>
+                        <span class="file-name">kuhaku_counter - 23136123</span>
+                    </div>
+                </div>
+                <div class="btn-right"><i class="fa-solid fa-crown"></i></div>
+            </a>
+
+            <!-- N - 黄 -->
+            <a href="word_checker" class="btn btn-yellow">
+                <div class="btn-left">
+                    <i class="fa-solid fa-star star-yellow"></i>
+                    <div class="text-wrap">
+                        <span class="link-name">頻出ワードチェッカー</span>
+                        <span class="file-name">word_cheker - 33122513</span>
+                    </div>
+                </div>
+                <div class="btn-right"><i class="fa-solid fa-crown"></i></div>
+            </a>
+
+            <!-- O - 青 -->
+            <a href="word_balance.html" class="btn btn-blue">
+                <div class="btn-left">
+                    <i class="fa-solid fa-star star-blue"></i>
+                    <div class="text-wrap">
+                        <span class="link-name">文字種バランスチェッカー</span>
+                        <span class="file-name">word_balance - 61910333</span>
+                    </div>
+                </div>
+                <div class="btn-right"><i class="fa-solid fa-crown"></i></div>
+            </a>
+
+            <!-- S - 赤 -->
+            <a href="https://example.com/5" class="btn btn-red">
+                <div class="btn-left">
+                    <i class="fa-solid fa-star star-red"></i>
+                    <div class="text-wrap">
+                        <span class="link-name">縦書きビューワー</span>
+                        <span class="file-name">tategaki - 1t4r0</span>
+                    </div>
+                </div>
+                <div class="btn-right"><i class="fa-solid fa-crown"></i></div>
+            </a>
+
+            <!-- 🌈 【復活！】5色フラットストライプボタン -->
+            <a href="https://example.com/stripe" class="btn btn-stripe">
+                <div class="btn-left">
+                    <i class="fa-solid fa-star star-white"></i>
+                    <div class="text-wrap">
+                        <span class="link-name">5人の足跡</span>
+                        <span class="file-name">amnos_history.html</span>
+                    </div>
+                </div>
+                <div class="btn-right"><i class="fa-solid fa-crown"></i></div>
+            </a>
+
+            <!-- 📸 【新設】Instagram風にじみグラデーションボタン -->
+            <a href="https://example.com/special" class="btn btn-instagram">
+                <div class="btn-left">
+                    <i class="fa-solid fa-star star-white"></i>
+                    <div class="text-wrap">
+                        <span class="link-name">5人の航海日誌</span>
+                        <span class="file-name">5_stars_forever.html</span>
+                    </div>
+                </div>
+                <div class="btn-right"><i class="fa-solid fa-crown"></i></div>
+            </a>
+
+        </div>
+
+        <footer>
+            <div class="member-border"></div>
+            <p>AMNOS - 5×26<br>忘れないでいよう</p>
+        </footer>
+
+    </div>
+
+</body>
+</html>

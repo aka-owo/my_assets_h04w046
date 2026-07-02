@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="robots" content="noindex,nofollow,noarchive">
+    <title>Text Extractor Triple</title>
+    <style>
+        /* 嵐メンバーカラー（大人トーン：緑・紫・黄・赤・青） */
+        :root {
+            --color-green: #70A940;  
+            --color-purple: #846E9D; 
+            --color-yellow: #E6B101; /* メインカラー */
+            --color-red: #CF5758;    
+            --color-blue: #8AABCC;   
+            
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-main: #2b2b2b;
+            --text-sub: #6c757d;
+            --border-color: #e9ecef;
+        }
+        
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            width: 100%;
+            max-width: 520px;
+            padding: 35px 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+        }
+
+        h2 {
+            text-align: center;
+            font-size: 1.15rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            color: var(--text-main);
+            margin: 0 0 35px 0;
+            position: relative;
+            padding-bottom: 15px;
+        }
+
+        h2::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 10%;
+            width: 80%;
+            height: 5px;
+            background: linear-gradient(to right, 
+                var(--color-green) 0% 20%, 
+                var(--color-purple) 20% 40%, 
+                var(--color-yellow) 40% 60%, 
+                var(--color-red) 60% 80%, 
+                var(--color-blue) 80% 100%
+            );
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-sub);
+            letter-spacing: 0.03em;
+            margin-bottom: 8px;
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            font-size: 16px; 
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            background-color: #fcfcfc;
+            color: var(--text-main);
+            -webkit-appearance: none;
+            appearance: none;
+            transition: all 0.25s ease;
+        }
+
+        input[type="text"]:focus, textarea:focus {
+            outline: none;
+            border-color: var(--color-yellow);
+            background-color: #fff;
+            box-shadow: 0 0 0 3px rgba(224, 176, 52, 0.15);
+        }
+
+        .main-textarea {
+            margin-bottom: 20px;
+        }
+        textarea {
+            height: 120px;
+            resize: none;
+        }
+
+        .btn-main {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background-color: var(--color-yellow);
+            color: #fff;
+            font-size: 0.95rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(224, 176, 52, 0.2);
+            transition: all 0.2s ease;
+        }
+
+        .btn-main:active {
+            transform: scale(0.98);
+        }
+
+        .result-section {
+            margin-top: 30px;
+            border-top: 1px dashed var(--border-color);
+            padding-top: 25px;
+        }
+
+        /* 最初は結果ブロック全体を非表示（display:none）にしておき、見つかったらJSで表示します */
+        .result-block {
+            margin-bottom: 25px;
+            display: none; 
+        }
+
+        .result-box {
+            margin-top: 8px;
+            padding: 14px 16px;
+            background-color: #fbfbfb;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            min-height: 48px;
+            max-height: 150px;
+            overflow-y: auto;
+            word-break: break-all;
+            font-size: 15px;
+            color: #495057;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+
+        .btn-copy {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 8px;
+            padding: 8px 16px;
+            background-color: #f1f3f5;
+            color: #495057;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .btn-copy:active {
+            transform: scale(0.96);
+        }
+        .btn-copy.copied {
+            background-color: #e2f0d9;
+            color: var(--color-green);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>TEXT EXTRACTOR</h2>
+
+        <div class="input-group">
+            <label for="startChar">START</label>
+            <input type="text" id="startChar" value="## 物語">
+        </div>
+        
+        <div class="input-group">
+            <label for="endChar">END</label>
+            <input type="text" id="endChar" value="返して】">
+        </div>
+
+        <div class="main-textarea">
+            <label for="inputText">SOURCE TEXT</label>
+            <textarea id="inputText" placeholder="ここにテキストを入力..."></textarea>
+        </div>
+
+        <button class="btn-main" onclick="extractAll()">テキストを解析・抽出する</button>
+
+        <div class="result-section">
+            <div class="result-block" id="block1">
+                <label>RESULT 1 (1箇所目)</label>
+                <div class="result-box" id="resultText1"></div>
+                <button class="btn-copy" id="copyBtn1" onclick="copyResult(1)">✓ RESULT 1 をコピー</button>
+            </div>
+
+            <div class="result-block" id="block2">
+                <label>RESULT 2 (2箇所目)</label>
+                <div class="result-box" id="resultText2"></div>
+                <button class="btn-copy" id="copyBtn2" onclick="copyResult(2)">✓ RESULT 2 をコピー</button>
+            </div>
+
+            <div class="result-block" id="block3">
+                <label>RESULT 3 (3箇所目)</label>
+                <div class="result-box" id="resultText3"></div>
+                <button class="btn-copy" id="copyBtn3" onclick="copyResult(3)">✓ RESULT 3 をコピー</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // コピー用の一時保管配列
+        let extractedTexts = ["", "", "", ""];
+
+        function extractAll() {
+            const text = document.getElementById('inputText').value;
+            const start = document.getElementById('startChar').value;
+            const end = document.getElementById('endChar').value;
+            
+            // 各種要素の取得
+            const blocks = [
+                null,
+                document.getElementById('block1'),
+                document.getElementById('block2'),
+                document.getElementById('block3')
+            ];
+            const resBoxes = [
+                null,
+                document.getElementById('resultText1'),
+                document.getElementById('resultText2'),
+                document.getElementById('resultText3')
+            ];
+            const btns = [
+                null,
+                document.getElementById('copyBtn1'),
+                document.getElementById('copyBtn2'),
+                document.getElementById('copyBtn3')
+            ];
+
+            // 一旦すべて非表示＆状態リセット
+            for (let i = 1; i <= 3; i++) {
+                blocks[i].style.display = "none";
+                resetBtn(btns[i], i);
+                resBoxes[i].style.color = "var(--text-main)";
+            }
+
+            if (!text || !start || !end) {
+                blocks[1].style.display = "block";
+                resBoxes[1].textContent = "Error: 入力欄が空欄です。";
+                return;
+            }
+
+            let currentPos = 0;
+
+            // --- 最大3回ループを回して抽出処理を行う ---
+            for (let count = 1; count <= 3; count++) {
+                
+                // 開始文字の検索
+                const startIdx = text.indexOf(start, currentPos);
+                if (startIdx === -1) {
+                    // 1箇所目すら見つからなかった場合のみエラーを出す
+                    if (count === 1) {
+                        blocks[1].style.display = "block";
+                        resBoxes[1].textContent = "Error: 開始文字が見つかりません。";
+                        resBoxes[1].style.color = "var(--color-red)";
+                    }
+                    break; // これ以上箇所がないのでループを抜ける
+                }
+                
+                // 終了文字の検索
+                const searchEndPos = startIdx + start.length;
+                const endIdx = text.indexOf(end, searchEndPos);
+                if (endIdx === -1) {
+                    blocks[count].style.display = "block";
+                    resBoxes[count].textContent = `Error: ${count}箇所目の終了文字が見つかりません。`;
+                    resBoxes[count].style.color = "var(--color-red)";
+                    break;
+                }
+                
+                // 切り出し位置の計算
+                const actualEnd = endIdx + end.length;
+                
+                // 抽出テキストを配列に保存して画面に表示
+                extractedTexts[count] = text.substring(startIdx, actualEnd);
+                resBoxes[count].textContent = extractedTexts[count];
+                
+                // 対象のブロックを表示する
+                blocks[count].style.display = "block";
+                
+                // 次の検索開始位置を、現在の終了文字の直後に設定
+                currentPos = actualEnd;
+            }
+        }
+
+        // 個別コピー用の関数
+        function copyResult(num) {
+            const textToCopy = extractedTexts[num];
+            const btn = document.getElementById(`copyBtn${num}`);
+
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                btn.classList.add('copied');
+                btn.textContent = `✓ コピー完了！`;
+                
+                setTimeout(() => {
+                    resetBtn(btn, num);
+                }, 2000);
+            }).catch(err => {
+                alert('Copy failed: ' + err);
+            });
+        }
+
+        function resetBtn(btn, num) {
+            btn.classList.remove('copied');
+            btn.textContent = `✓ RESULT ${num} をコピー`;
+        }
+    </script>
+
+</body>
+</html>
